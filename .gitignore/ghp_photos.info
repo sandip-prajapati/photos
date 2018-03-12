@@ -1,0 +1,5 @@
+name = GHP Photos
+description = GHP Photos for Gandhiji
+core = 7.x
+project = "ghp"
+

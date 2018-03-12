@@ -1,0 +1,956 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ *
+ * Set up calls to drupal_get_form() for all our example cases.
+ */
+function ghp_photos_menu() {
+    $items = array();
+
+    $items['photos'] = array(
+        'title' => t('Photos'),
+        'page callback' => 'ghp_all_photos_list',
+        'access callback' => TRUE,
+        'type' => MENU_SUGGESTED_ITEM,
+        'file' => 'ghp_photos.inc',
+    );
+    $items['taglist'] = array(
+        'title' => t('taglist'),
+        'page callback' => 'tag_list',
+        'access callback' => TRUE,
+        'type' => MENU_SUGGESTED_ITEM,
+        'file' => 'ghp_photos.inc',
+    );
+
+    $items['photos_other_reference/%'] = array(
+        'title' => t('Photos'),
+        'page callback' => 'ajax_pass_reference',
+        'access callback' => TRUE,
+        'type' => MENU_SUGGESTED_ITEM,
+        'file' => 'ghp_photos.inc',
+    );
+		
+    $items['photosdetail/%'] = array(
+        'title' => t('Photo Detail Page'),
+        'page callback' => 'photos_detail_page',
+        'access callback' => TRUE,
+        'type' => MENU_SUGGESTED_ITEM,
+        'file' => 'ghp_photos.inc',
+    );
+
+    $items['photos_thumbview'] = array(
+        'title' => t('Photos'),
+        'page callback' => 'ghp_all_thumb_photos_list',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+        'file' => 'ghp_photos.inc',
+    );
+	
+    $items['photos_reference'] = array(
+        'title' => t('Photos'),
+        'page callback' => 'getphotos_reference_photos',
+        'access callback' => TRUE,
+        'type' => MENU_SUGGESTED_ITEM,
+        'file' => 'ghp_photos.inc',
+    );
+	
+    $items['photos_ajaxthumbview'] = array(
+        'title' => t('Photos'),
+        'page callback' => 'ghp_photos_all_thumb_ajaxphotos_list',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+        'file' => 'ghp_photos.inc',
+    );
+
+    $items['photos_thumbajaxview'] = array(
+        'title' => t('Photos'),
+        'page callback' => 'ghp_all_thumb_ajax_photos_list',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+        'file' => 'ghp_photos.inc',
+    );
+
+    $items['get_ajax_photos_data'] = array(
+        'title' => t('Photos'),
+        'page callback' => 'get_ajax_photos_data',
+        'access callback' => TRUE,
+        'type' => MENU_SUGGESTED_ITEM,
+        'file' => 'ghp_photos.inc',
+    );
+
+    $items['get_ajax_thumb_photos_data'] = array(
+        'title' => t('Photos'),
+        'page callback' => 'get_ajax_thumb_photos_data',
+        'access callback' => TRUE,
+        'type' => MENU_SUGGESTED_ITEM,
+        'file' => 'ghp_photos.inc',
+    );
+
+    $items['photos/rss'] = array(
+        'title' => t('Photos Rss'),
+        'page callback' => 'ghp_all_photos_rss',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+        'file' => 'ghp_photos.admin.inc',
+    );
+	
+    $items['photos/rss/%'] = array(
+        'title' => t('Photos Rss'),
+        'page callback' => 'ghp_photos_rss',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+        'file' => 'ghp_photos.admin.inc',
+    );
+	
+    // START FOR GHP PHOTOS ADMIN MENU
+    $items['admin/ghp_photos'] = array(
+        'title' => t('Photos Management'),
+        'page callback' => 'ghp_photos_list',
+        'access callback' => 'user_access',
+        'access arguments' => array('Photos List'),
+        'type' => MENU_SUGGESTED_ITEM,
+        'file' => 'ghp_photos.admin.inc',
+    );
+    $items['admin/ghp_photos/list'] = array(
+        'title' => t('Photos Management - List'),
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'weight' => -10,
+        'access callback' => 'user_access',
+        'access arguments' => array('Photos List'),
+    );
+
+    $items['admin/ghp_photos/delete'] = array(
+        'title' => 'Delete Photo',
+        'page callback' => 'photos_delete',
+        'access callback' => 'user_access',
+        'access arguments' => array('Delete Photos'),
+        'file' => 'ghp_photos.admin.inc',
+    );
+    
+    $items['admin/ghp_photos/deleteall'] = array(
+        'title' => 'Delete Photos',
+        'page callback' => 'photos_deleteall',
+        'access callback' => 'user_access',
+        'access arguments' => array('Delete Photos'),
+        'file' => 'ghp_photos.admin.inc',
+    );
+
+    $items['admin/ghp_photos/add'] = array(
+        'title' => t('Photo Management - Add/Edit'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('ghp_photo_add_form'),
+        'access callback' => 'user_access',
+        'access arguments' => array('Add/Edit Photos'),
+        'type' => MENU_LOCAL_TASK,
+        'weight' => -9,
+        'file' => 'ghp_photos.admin.inc',
+    );
+    
+    $items['admin/savetag'] = array(
+        'title' => 'save list of tag',
+        'page callback' => 'savetag',
+        'access callback' => 'user_access',
+        'access arguments' => array('Tag'),
+        'type' => MENU_SUGGESTED_ITEM,
+        'weight' => 9,
+        'file' => 'ghp_photos.admin.inc',
+    );
+    
+    $items['admin/taglist'] = array(
+        'title' => 'tag list',
+        'page callback' => 'taglist',
+        'access callback' => 'user_access',
+        'access arguments' => array('Taglist'),
+        'type' => MENU_SUGGESTED_ITEM,
+        'weight' => 9,
+        'file' => 'ghp_photos.admin.inc',
+    );
+
+    $items['admin/ghp_photos/ghpPhotoAdminDownload/%'] = array(
+        'title' => 'photo Download Page',
+        'page callback' => 'ghpPhotoAdminDownload',
+        'access callback' => 'user_access',
+        'access arguments' => array('Photo Download'),
+        'type' => MENU_CALLBACK,
+        'page arguments' => array(3),
+        'file' => 'ghp_photos.admin.inc',
+    );
+
+    $items['admin/ghp_photos/photo_import'] = array(
+        'title' => 'Photo Content Import',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('photo_import_add_form'),
+        'access callback' => 'user_access',
+        'access arguments' => array('Import Photos'),
+        'type' => MENU_LOCAL_TASK,
+        'weight' => 1,
+        'file' => 'ghp_photos.admin.inc',
+    );
+   
+    $items['admin/ghp_photos/photo_reference_import'] = array(
+        'title' => 'Photo Other Reference Import',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('photo_reference_import_add_form'),
+        'access callback' => 'user_access',
+        'access arguments' => array('Import Photos Reference'),
+        'type' => MENU_LOCAL_TASK,
+        'weight' => 2,
+        'file' => 'ghp_photos.admin.inc',
+    );
+
+    $items['admin/ghp_photos/publish'] = array(
+        'title' => 'Publish Photos',
+        'page callback' => 'ghp_photos_publish',
+        'access callback' => 'user_access',
+        'access arguments' => array('Publish Photos'),
+        'file' => 'ghp_photos.admin.inc',
+    );
+
+    $items['admin/ghp_photos/approve'] = array(
+        'title' => 'Approve Photos',
+        'page callback' => 'ghp_photos_approve',
+        'access callback' => 'user_access',
+        'access arguments' => array('Approve Photos'),
+        'file' => 'ghp_photos.admin.inc',
+    );
+    
+     $items['admin/ghp_photos/unpublish'] = array(
+        'title' => 'Publish Photos',
+        'page callback' => 'ghp_photos_unpublish',
+        'access callback' => 'user_access',
+        'access arguments' => array('Publish Photos'),
+        'file' => 'ghp_photos.admin.inc',
+    );
+
+    $items['admin/ghp_photos/reject'] = array(
+        'title' => 'Approve Photos',
+        'page callback' => 'ghp_photos_reject',
+        'access callback' => 'user_access',
+        'access arguments' => array('Approve Photos'),
+        'file' => 'ghp_photos.admin.inc',
+    );
+    
+    $items['admin/ghp_photos/photo_category'] = array(
+        'title' => 'Photo Category - List',
+        'page callback' => 'ghp_photocategory_list',
+        'access callback' => 'user_access',
+        'access arguments' => array('Photo Category Listing'),
+        'type' => MENU_LOCAL_TASK,
+        'file' => 'photo_category.admin.inc',
+    );
+    
+    $items['admin/photo_category/add'] = array(
+        'title' => '',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('ghp_photocategory_add_form'),                
+         'access callback' => 'user_access',
+        'access arguments' => array('Category Add'),
+        'file' => 'photo_category.admin.inc',
+    );
+    
+    $items['admin/photo_category/delete'] = array(
+        'title' => 'Delete Photo Category',
+        'page callback' => 'photocategory_delete',
+        'access callback' => 'user_access',
+        'access arguments' => array('Photo Category Delete'),
+		'type' => MENU_LOCAL_TASK,
+        'file' => 'photo_category.admin.inc',
+    );
+	
+	 $items['admin/photo_category/deleteall'] = array(
+        'title' => 'Delete Photo Category',
+        'page callback' => 'photocategory_deleteall',
+        'access callback' => 'user_access',
+        'access arguments' => array('Photo Category DeleteAll'),
+		'type' => MENU_LOCAL_TASK,
+        'file' => 'photo_category.admin.inc',
+    );
+    
+		$items['photoDownload/%'] = array(
+        'title' => 'Photos',
+        'page callback' => 'photoDownload',
+        'access callback' => TRUE,
+        'access arguments' => array('access content'),
+				'page arguments' => array(1),
+    );
+		
+		$items['photoDownloadZip'] = array(
+        'title' => 'Photos',
+        'page callback' => 'photoDownloadZip',
+        'access callback' => TRUE,
+        'access arguments' => array('access content'),
+   			'file' => 'ghp_photos.inc',
+    );
+    
+    // STOP FOR GHP PHOTOS ADMIN MENU
+
+    return $items;
+}
+
+function ghp_photos_permission() {
+    $perms = array(
+        'Add/Edit Photos' => array('title' => t('Add/Edit Photos')),
+        'Delete Photos' => array('title' => t('Delete Photos')),
+        'Approve Photos' => array('title' => t('Approve Photos')),
+        'Publish Photos' => array('title' => t('Publish Photos')),
+        'Import Photos' => array('title' => t('Import Photos')),
+        'Photos List' => array('title' => t('Photos List')),
+        'Photo Download' => array('title' => t('Photo Download')),        
+    );
+    return $perms;
+}
+
+function ghp_photos_block_info() {
+
+    $blocks['photos_searchyearleftblock'] = array(
+        'info' => t('Photos Search Year Left Block'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+
+    $blocks['photos_thuumbsearchyearleftblock'] = array(
+        'info' => t('Photos Thumbnail View Search Year Left Block'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+
+    $blocks['photos_searchyearsliderblock'] = array(
+        'info' => t('Photos Search Year Slider Block'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+
+    $blocks['photos_thumbsearchsliderblock'] = array(
+        'info' => t('Photos Thumb Search Year Slider Block'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+
+
+
+    return $blocks;
+}
+
+function ghp_photos_block_view($delta) {
+
+    $block = array();
+
+    switch ($delta) {
+
+        case 'photos_searchyearleftblock':
+            $block['content'] = ghp_photos_searchyear_block();
+            break;
+
+        case 'photos_thuumbsearchyearleftblock':
+            $block['content'] = ghp_photos_thuumbsearchyearleftblock();
+            break;
+
+        case 'photos_searchyearsliderblock':
+            $block['content'] = ghp_photos_search_year_slider_block();
+            break;
+        case 'photos_thumbsearchsliderblock':
+            $block['content'] = ghp_photos_thumbsearchsliderblock();
+            break;
+    }
+    return $block;
+}
+
+function ghp_photos_thumbsearchsliderblock() {
+    global $language, $base_path, $base_url, $photo_query_condition;
+
+    if ($photo_query_condition != '') {
+        $extraurl = "/" . arg(1) . "/" . arg(2);
+    } else {
+        $extraurl = "";
+    }
+
+    drupal_add_css(drupal_get_path('module', 'searchyearslider') . '/css/jslider.css');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/jshashtable-2.1_src.js');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/jquery.numberformatter-1.2.3.js');
+
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/tmpl.js');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/jquery.dependClass-0.1.js');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/draggable-0.1.js');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/jquery.slider.js');
+    drupal_add_js(drupal_get_path('module', 'ghp_photos') . '/js/customthumbsearchyear.js');
+
+    $range = "";
+    $i = 1869;
+    while ($i <= 1949) {
+        if ($i != 1949) {
+            $range .=$i . ",";
+        } else {
+            $i = $i - 1;
+            $range .=$i;
+        }
+
+        $i = $i + 5;
+    }
+
+    $output1 = '<input type="hidden" name="inputslidetest" id="inputslidetest" value="' . $range . '" /><div class="timeFrame"> 
+          		<span class="title"><label for="Slider4">' . t('Choose the Year Range:') . '</label></span>
+           		<div class="timeSlider"><div class="layout">';
+    $output1 .='<div class="mainslider" id="mainslider" style="display:none">
+				<div class="layout-slider">
+				<span id="slidecontrol">
+				<input id="Slider4"  name="area" value="1869;1948" />
+				</span>
+				</div>
+				<div class="yearblock">
+					<span class="year1">1869</span>
+					<span class="year2">1874</span>
+					<span class="year3">1879</span>
+					<span class="year4">1884</span>
+					<span class="year5">1889</span>
+					<span class="year6">1894</span>
+					<span class="year7">1899</span>
+					<span class="year8">1904</span>
+					<span class="year9">1909</span>
+					<span class="year10">1914</span>
+					<span class="year11">1919</span>
+					<span class="year12">1924</span>
+					<span class="year13">1929</span>
+					<span class="year14">1934</span>
+					<span class="year15">1939</span>
+					<span class="year16">1944</span>
+					<span class="year17">1948</span>
+				</div>';
+    $output1 .='</div>';
+
+    $output1 .='<div id="mainslider1" class="mainslider1"><div class="layout-slider">';
+	$defaultlan = language_default();
+    $trans_url = $base_url;
+    if($language->language != $defaultlan->language) { 
+        $trans_url .= "/".$language->language;
+    }
+    $output1 .='<form name="searchsliderform" id="searchsliderform" action="' . $trans_url . '/photos_thumbview' . $extraurl . '" method="post"><div class="startyear" style="display:inline;"><label for="startyear">' . t('Start Year: ') . '</label><select name="startyear" id="startyear">';
+    for ($i = 1869; $i <= 1948; $i++) {
+        if (!empty($_POST['startyear'])) {
+            $startyearval = $_POST['startyear'];
+        } else {
+            $startyearval = "1869";
+        }
+
+        if (!empty($startyearval)) {
+
+            if ($i == $startyearval) {
+
+                $selectedval = "selected='selected'";
+            } else {
+                $selectedval = "";
+            }
+        } else {
+            $selectedval = "";
+        }
+
+
+        $output1 .='<option value="' . $i . '" ' . $selectedval . ' >' . $i . '</option>';
+    }
+    $output1 .='</select></div>';
+    $output1 .='<div class="endyear" style="display:inline;"><label for="endyear">' . t('End Year: ') . '</label><select name="endyear" id="endyear">';
+
+    for ($i = 1869; $i <= 1948; $i++) {
+
+        if (!empty($_POST['endyear'])) {
+            $endyearval = $_POST['endyear'];
+        } else {
+            $endyearval = "1948";
+        }
+
+
+        if (!empty($endyearval)) {
+
+            if ($i == $endyearval) {
+
+                $selectedendval = "selected='selected'";
+            } else {
+                $selectedendval = "";
+            }
+        } else {
+            $selectedendval = "";
+        }
+
+
+        $output1 .='<option value="' . $i . '" ' . $selectedendval . '>' . $i . '</option>';
+    }
+    $output1 .='</select></div>';
+    $output1 .='<div class="submityear" style="display:inline;"><input type="submit" class="showVolumes"  value="' . t('Show Photos') . '" name="searchphotos" title="' . t('Show Photos') . '" /></div>';
+    $output1 .='</form>';
+    $output1 .='</div></div>';
+
+    $output1 .='</div></div><div class="curve"></div></div>';
+
+
+    return $output1;
+}
+
+function ghp_photos_theme() {
+    return array(
+        'ghp_photoslist' => array(
+            'template' => 'ghp_photoslist',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+        ),
+		'ghp_photosdetail' => array(
+            'template' => 'ghp_photosdetail',
+            'arguments' => array('')
+        ),
+        'ghp_tab_header_reference' => array(
+            'template' => 'ghp_tab_header_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_video_reference' => array(
+            'template' => 'ghp_video_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_cartoon_reference' => array(
+            'template' => 'ghp_cartoon_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_audio_reference' => array(
+            'template' => 'ghp_audio_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_poster_reference' => array(
+            'template' => 'ghp_poster_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_stamp_reference' => array(
+            'template' => 'ghp_stamp_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_variorum_reference' => array(
+            'template' => 'ghp_variorum_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+         'ghp_book_reference' => array(
+            'template' => 'ghp_book_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_journal_by_gandhi_reference' => array(
+            'template' => 'ghp_journal_by_gandhi_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_journal_by_other_reference' => array(
+            'template' => 'ghp_journal_by_other_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_othersection_reference' => array(
+            'template' => 'ghp_othersection_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_cwmg_reference' => array(
+            'template' => 'ghp_cwmg_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_tribute_reference' => array(
+            'template' => 'ghp_tribute_reference',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_video_reference_loadmore' => array(
+            'template' => 'ghp_video_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_cartoon_reference_loadmore' => array(
+            'template' => 'ghp_cartoon_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_audio_reference_loadmore' => array(
+            'template' => 'ghp_audio_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_poster_reference_loadmore' => array(
+            'template' => 'ghp_poster_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_stamp_reference_loadmore' => array(
+            'template' => 'ghp_stamp_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_variorum_reference_loadmore' => array(
+            'template' => 'ghp_variorum_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_cwmg_reference_loadmore' => array(
+            'template' => 'ghp_cwmg_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_tribute_reference_loadmore' => array(
+            'template' => 'ghp_tribute_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_photo_reference_loadmore' => array(
+            'template' => 'ghp_photo_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_book_reference_loadmore' => array(
+            'template' => 'ghp_book_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_journal_by_gandhi_reference_loadmore' => array(
+            'template' => 'ghp_journal_by_gandhi_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_journal_by_other_reference_loadmore' => array(
+            'template' => 'ghp_journal_by_other_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        'ghp_othersection_reference_loadmore' => array(
+            'template' => 'ghp_othersection_reference_loadmore',
+            'arguments' => array('photoCount' => NULL, 'photoListArray' => NULL, 'totalPhotoCount' => NULL),
+            'path' => drupal_get_path('module', 'ghp_references')
+        ),
+        
+        
+			/*	'ghp_photos_reference' => array(
+            'template' => 'ghp_photos_reference',
+            'arguments' => array('')
+        )	*/			
+				
+    );
+}
+
+function ghp_photos_thuumbsearchyearleftblock() {
+    global $language, $base_url, $photo_query_condition;
+
+    if ($photo_query_condition != '') {
+        $extraurl = "/" . arg(1) . "/" . arg(2);
+    } else {
+        $extraurl = "";
+    }
+    
+    // SET VARIABLE FROM GLOBAL SEARCH KEYWORD
+    if(isset($_SESSION['header_search_keyword']) &&  $_SESSION['header_search_keyword'] != '')
+    {    
+        $global_search_condition = " AND ( pd.photo_title LIKE '%".$_SESSION['header_search_keyword']."%' OR pd.photo_description LIKE '%".$_SESSION['header_search_keyword']."%' ) ";
+    }
+    else
+    {    
+        $global_search_condition = '';
+    }
+
+    drupal_add_js(drupal_get_path('module', 'ghp_photos') . '/js/customthumbsearchyear.js');
+
+    $resultrange = db_query("select * from search_yearblock limit 0,1");
+    $rowcount = $resultrange->rowCount();
+    $rowobject = $resultrange->fetchAssoc();
+
+    $output = '<div class="refineSearchWrapper">
+              <div class="yeardisplay"><span id="yearstartspan">' . ((isset($_POST['startyear']) && ($_POST['startyear'] != '')) ? $_POST['startyear'] : $rowobject["yearstart"] ) . '</span> <span>to</span> <span id="yearendspan">' . ((isset($_POST['endyear']) && ($_POST['endyear'] != '')) ? $_POST['endyear'] : $rowobject["yearend"] ) . '</span></div>
+              <h3 class="title">' . t('Refine your Search:') . '</h3>
+              <form action="' . $base_url . '/photos_thumbview' . $extraurl . '" id="thumbLeftFrm" name="thumbLeftFrm" method="post">
+                <ul class="block" id="leftPanelCheckboxListing" style="display:none;">
+                  <li class="head">
+                    <input id="CheckBox1" type="checkbox"  class="checkBoxClass" />
+                    <label for="CheckBox1" class="checkBoxLabel">' . t('All Years') . '</label></li>';
+
+    $i = $rowobject["yearstart"];
+    while ($i <= $rowobject["yearend"]) {
+        $j = $i + $rowobject["year_range"] - 1;
+
+        if (!empty($language->language)) {
+            $resultyear = db_query("select count(pm.photo_id) as total from photo_master pm LEFT JOIN photo_detail pd ON pm.photo_id = pd.photo_id where year(pm.photo_date) >= '" . $i . "' and year(pm.photo_date) <= '" . $j . "' and pd.language_code='" . $language->language . "' " . $photo_query_condition . $global_search_condition);
+            $rowyear = $resultyear->fetchAssoc();
+            $rowcountyear = $resultyear->rowCount();
+        }
+
+        $output .='<li>';
+        $output .='<input id="CheckBox' . $i . '" type="checkbox" name="yearrangecheck[]" value="' . $i . '-' . $j . '" class="checkBoxClass" />';
+        $output .='<label for="CheckBox' . $i . '" class="checkBoxLabel">' . $i . ' - ' . $j . ' (' . $rowyear["total"] . ')</label></li>';
+
+        $i = $i + $rowobject["year_range"];
+    }
+
+    $output .='</ul>
+                
+            <ul id="jsdisablecheckboxlisting">';
+    $a = $rowobject["yearstart"];
+    while ($a <= $rowobject["yearend"]) {
+        $b = $a + $rowobject["year_range"] - 1;
+        if (!empty($language->language)) {
+            $resultyear_new = db_query("select count(pm.photo_id) as total from photo_master pm LEFT JOIN photo_detail pd ON pm.photo_id = pd.photo_id where year(pm.photo_date) >= '" . $a . "' and year(pm.photo_date) <= '" . $b . "' and pd.language_code='" . $language->language . "' " . $photo_query_condition. $global_search_condition );
+            $rowyear_new = $resultyear_new->fetchAssoc();
+            $rowcountyear_new = $resultyear_new->rowCount();
+        }
+        $output .='<li>';
+
+        if (isset($_POST['yearrangecheck'])) {
+            if (in_array($a . '-' . $b, $_POST['yearrangecheck'])) {
+                $selectedcheckboxvalue = "checked='checked'";
+            } else {
+                $selectedcheckboxvalue = "";
+            }
+        } else {
+            $selectedcheckboxvalue = "";
+        }
+
+        $output .='<input id="jsdisablechk_' . $a . '" type="checkbox" name="yearrangecheck[]" value="' . $a . '-' . $b . '" ' . $selectedcheckboxvalue . ' />';
+        $output .='<label for="jsdisablechk_' . $a . '" class="checkBoxDisabledLabel">' . $a . ' - ' . $b . ' (' . $rowyear_new["total"] . ')</label></li>';
+        $a = $a + $rowobject["year_range"];
+    }
+    $output .="<li><input type='hidden' name='language' id='language' value='" . $language->language . "' />";
+    $output .="<input type='hidden' name='basepathvalue' id='basepathvalue' value='" . $base_url . "'/></li>";
+    $output .='<li><input type="submit" name="btnPhotoFilterYear" class="filterBtn" value="Filter" title="Filter" /></li></ul></form></div>';
+    return $output;
+}
+
+function ghp_photos_searchyear_block() {
+
+    global $language, $photo_query_condition;
+
+    $resultrange = db_query("select * from search_yearblock limit 0,1");
+    $rowcount = $resultrange->rowCount();
+    $rowobject = $resultrange->fetchAssoc();
+    
+    // SET VARIABLE FROM GLOBAL SEARCH KEYWORD
+    if(isset($_SESSION['header_search_keyword']) &&  $_SESSION['header_search_keyword'] != '')
+    {    
+        $global_search_condition = " AND ( pd.photo_title LIKE '%".$_SESSION['header_search_keyword']."%' OR pd.photo_description LIKE '%".$_SESSION['header_search_keyword']."%' ) ";
+    }
+    else
+    {    
+        $global_search_condition = '';
+    }
+    
+    $output = '<div class="refineSearchWrapper">
+              <div class="yeardisplay"><span id="yearstartspan">' . ((isset($_POST['startyear']) && ($_POST['startyear'] != '')) ? $_POST['startyear'] : $rowobject["yearstart"] ) . '</span> <span>to</span> <span id="yearendspan">' . ((isset($_POST['endyear']) && ($_POST['endyear'] != '')) ? $_POST['endyear'] : $rowobject["yearend"] ) . '</span></div>
+              <h3 class="title">' . t('Refine your Search:') . '</h3>
+              <form action="" method="post">
+                <ul class="block" id="leftPanelCheckboxListing" style="display:none;">
+                  <li class="head">
+                    <input id="CheckBox1" type="checkbox"  class="checkBoxClass" />
+                    <label for="CheckBox1" class="checkBoxLabel">' . t('All Years') . '</label></li>';
+
+    $i = $rowobject["yearstart"];
+
+    while ($i <= $rowobject["yearend"]) {
+        $j = $i + $rowobject["year_range"] - 1;
+
+        if (!empty($language->language)) {
+            $resultyear = db_query("select count(pm.photo_id) as total from photo_master pm LEFT JOIN photo_detail pd ON pm.photo_id = pd.photo_id where year(pm.photo_date) >= '" . $i . "' and year(pm.photo_date) <= '" . $j . "' and pd.language_code='" . $language->language . "' " . $photo_query_condition. $global_search_condition);
+            $rowyear = $resultyear->fetchAssoc();
+            $rowcountyear = $resultyear->rowCount();
+        }
+        
+        $output .='<li>';
+        $output .='<input id="CheckBox' . $i . '" type="checkbox" name="yearrangecheck[]" value="' . $i . '-' . $j . '" class="checkBoxClass" />';
+        $output .='<label for="CheckBox' . $i . '" class="checkBoxLabel">' . $i . ' - ' . $j . ' (' . $rowyear["total"] . ')</label></li>';
+
+        $i = $i + $rowobject["year_range"];
+    }
+
+    $output .='</ul>
+                
+            <ul id="jsdisablecheckboxlisting">';
+    $a = $rowobject["yearstart"];
+    while ($a <= $rowobject["yearend"]) {
+        $b = $a + $rowobject["year_range"] - 1;
+        if (!empty($language->language)) {
+            $resultyear_new = db_query("select count(pm.photo_id) as total from photo_master pm LEFT JOIN photo_detail pd ON pm.photo_id = pd.photo_id where year(pm.photo_date) >= '" . $a . "' and year(pm.photo_date) <= '" . $b . "' and pd.language_code='" . $language->language . "' " . $photo_query_condition. $global_search_condition);
+            $rowyear_new = $resultyear_new->fetchAssoc();
+            $rowcountyear_new = $resultyear_new->rowCount();
+        }
+        $output .='<li>';
+
+        if (isset($_POST['yearrangecheck'])) {
+            if (in_array($a . '-' . $b, $_POST['yearrangecheck'])) {
+                $selectedcheckboxvalue = "checked='checked'";
+            } else {
+                $selectedcheckboxvalue = "";
+            }
+        } elseif (isset($_COOKIE['photo_filteryearcheckbox'])) {
+            if (in_array($a . '-' . $b, unserialize(base64_decode($_COOKIE['photo_filteryearcheckbox'])))) {
+                $selectedcheckboxvalue = "checked='checked'";
+            } else {
+                $selectedcheckboxvalue = "";
+            }
+        } else {
+            $selectedcheckboxvalue = "";
+        }
+
+        $output .='<input id="jsdisablechk_' . $a . '" type="checkbox" name="yearrangecheck[]" value="' . $a . '-' . $b . '" ' . $selectedcheckboxvalue . ' />';
+        $output .='<label for="jsdisablechk_' . $a . '" class="checkBoxDisabledLabel">' . $a . ' - ' . $b . ' (' . $rowyear_new["total"] . ')</label></li>';
+        $a = $a + $rowobject["year_range"];
+    }
+
+    $output .='<li><input type="submit" name="btnPhotoFilterYear" class="filterBtn" value="Filter" title="Filter" /></li></ul></form></div>';
+    return $output;
+}
+
+function ghp_photos_search_year_slider_block() {
+    drupal_add_css(drupal_get_path('module', 'searchyearslider') . '/css/jslider.css');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/jshashtable-2.1_src.js');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/jquery.numberformatter-1.2.3.js');
+
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/tmpl.js');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/jquery.dependClass-0.1.js');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/draggable-0.1.js');
+    drupal_add_js(drupal_get_path('module', 'searchyearslider') . '/js/jquery.slider.js');
+
+    $range = "";
+    $i = 1869;
+    while ($i <= 1949) {
+        if ($i != 1949) {
+            $range .=$i . ",";
+        } else {
+            $i = $i - 1;
+            $range .=$i;
+        }
+
+        $i = $i + 5;
+    }
+
+    $output1 = '<input type="hidden" name="inputslidetest" id="inputslidetest" value="' . $range . '" /><div class="timeFrame"> 
+          		<span class="title"><label for="Slider4">' . t('Choose the Year Range:') . '</label></span>
+           		<div class="timeSlider"><div class="layout">';
+    $output1 .='<div class="mainslider" id="mainslider" style="display:none">
+				<div class="layout-slider">
+				<span id="slidecontrol">
+				<input id="Slider4"  name="area" value="1869;1948" />
+				</span>
+				</div>
+				<div class="yearblock">
+					<span class="year1">1869</span>
+					<span class="year2">1874</span>
+					<span class="year3">1879</span>
+					<span class="year4">1884</span>
+					<span class="year5">1889</span>
+					<span class="year6">1894</span>
+					<span class="year7">1899</span>
+					<span class="year8">1904</span>
+					<span class="year9">1909</span>
+					<span class="year10">1914</span>
+					<span class="year11">1919</span>
+					<span class="year12">1924</span>
+					<span class="year13">1929</span>
+					<span class="year14">1934</span>
+					<span class="year15">1939</span>
+					<span class="year16">1944</span>
+					<span class="year17">1948</span>
+				</div>';
+    $output1 .='</div>';
+
+    $output1 .='<div id="mainslider1" class="mainslider1"><div class="layout-slider">';
+    $output1 .='<form name="searchsliderform" id="searchsliderform" action="" method="post"><div class="startyear" style="display:inline;"><label for="startyear">' . t('Start Year: ') . '</label><select name="startyear" id="startyear">';
+    for ($i = 1869; $i <= 1948; $i++) {
+        if (!empty($_POST['startyear'])) {
+            $startyearval = $_POST['startyear'];
+        } elseif (!empty($_COOKIE['photo_startyear'])) {
+            $startyearval = unserialize(base64_decode($_COOKIE['photo_startyear']));
+        } else {
+            $startyearval = "1869";
+        }
+
+        if (!empty($startyearval)) {
+
+            if ($i == $startyearval) {
+
+                $selectedval = "selected='selected'";
+            } else {
+                $selectedval = "";
+            }
+        } else {
+            $selectedval = "";
+        }
+
+
+        $output1 .='<option value="' . $i . '" ' . $selectedval . ' >' . $i . '</option>';
+    }
+    $output1 .='</select></div>';
+    $output1 .='<div class="endyear" style="display:inline;"><label for="endyear">' . t('End Year: ') . '</label><select name="endyear" id="endyear">';
+
+    for ($i = 1869; $i <= 1948; $i++) {
+
+        if (!empty($_POST['endyear'])) {
+            $endyearval = $_POST['endyear'];
+        } elseif (!empty($_COOKIE['photo_endyear'])) {
+            $endyearval = unserialize(base64_decode($_COOKIE['photo_endyear']));
+        } else {
+            $endyearval = "1948";
+        }
+
+        if (!empty($endyearval)) {
+
+            if ($i == $endyearval) {
+
+                $selectedendval = "selected='selected'";
+            } else {
+                $selectedendval = "";
+            }
+        } else {
+            $selectedendval = "";
+        }
+
+
+        $output1 .='<option value="' . $i . '" ' . $selectedendval . '>' . $i . '</option>';
+    }
+    $output1 .='</select></div>';
+    $output1 .='<div class="submityear" style="display:inline;"><input type="submit" class="showVolumes"  value="' . t('Show Photos') . '" name="searchphotos" title="' . t('Show Photos') . '" /></div>';
+    $output1 .='</form>';
+    $output1 .='</div></div>';
+
+    $output1 .='</div></div><div class="curve"></div></div>';
+
+
+    return $output1;
+}
+
+function photoDownload($arg) {
+   $photo_id = $arg;
+    $filename_photo = base64_decode($photo_id);		
+   // $downloadfile_photo = drupal_realpath(file_default_scheme() . '://') . '\ghp_photos\\';		//original live
+   $ghp_data_root_path = variable_get('ghp_data_root_path');
+   //$downloadfile_photo =  $ghp_data_root_path.'ghp_photos/download/';		//custom path
+	 $ghp_photo_download_path = variable_get('ghp_photo_download_images_path');
+   $target_path_photo = $ghp_photo_download_path . $filename_photo;
+  
+	ob_clean();
+	ob_start();
+	if(is_file($target_path_photo)) {
+	ini_set('zlib.output_compression', 'Off');	
+	switch(strtolower(substr(strrchr($filename_photo, '.'), 1))) {
+		case 'pdf': $mime = 'application/pdf'; break;
+		case 'zip': $mime = 'application/zip'; break;
+		case 'jpeg':
+		case 'jpg': $mime = 'image/jpg'; break;
+		default: $mime = 'application/force-download';
+	}
+	header('Pragma: public'); 	// required
+	header('Expires: 0');		// no cache
+	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+	header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime ($target_path_photo)).' GMT');
+	header('Cache-Control: private',false);
+	header('Content-Type: '.$mime);
+	header('Content-Disposition: attachment; filename="'.basename($filename_photo).'"');
+	header('Content-Transfer-Encoding: binary');
+	header('Content-Length: '.filesize($target_path_photo));	// provide file size
+	header('Connection: close');
+	readfile($target_path_photo);		// push it out
+	exit();
+
+}else {
+             drupal_set_message(t('Photo Not Found.'));
+							drupal_goto("photos-of-mahatma-gandhi");   
+				}
+}
